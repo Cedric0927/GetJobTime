@@ -5,7 +5,7 @@ import { Background } from './components/Background'
 import { SearchBar } from './components/SearchBar'
 import { ResultCard } from './components/ResultCard'
 import { Radar } from 'lucide-react'
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from '@vercel/analytics/react'
 
 function App() {
   const [url, setUrl] = useState('')
@@ -78,10 +78,10 @@ function App() {
 
       <footer className="py-6 text-center mt-auto relative z-10">
         <p className="text-xs font-medium text-slate-400 tracking-wider">
-          <Analytics />
           专为求职者设计 · 效率工具
         </p>
       </footer>
+      <Analytics />
     </div>
   )
 }

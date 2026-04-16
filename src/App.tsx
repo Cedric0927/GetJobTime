@@ -189,7 +189,8 @@ function App() {
             岗位发布时间提取器
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed balance-text max-w-xl mx-auto">
-            很多招聘官网隐藏了发布时间，粘贴岗位链接，我们帮你找出它的真实发布日期，避免把时间浪费在沉寂的岗位上。
+            很多招聘官网隐藏了发布时间，粘贴岗位链接，我们帮你找出它的真实发布日期，避免把时间浪费在沉寂的岗位上。<br /><br />
+            目前只支持飞书类型如字节跳动、智谱、影视飓风的岗位链接，获取失败或者非飞书网站可以留言许愿哦~
           </p>
         </motion.div>
 

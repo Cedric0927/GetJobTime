@@ -1,4 +1,3 @@
-import React from 'react'
 import { motion } from 'framer-motion'
 import { type JobTimeResponse } from '../api'
 import { format, parseISO } from 'date-fns'

@@ -58,7 +58,7 @@ function App() {
             很多招聘官网隐藏了发布时间，粘贴岗位链接，我们帮你找出它的真实发布日期，避免把时间浪费在沉寂的岗位上。
             <br className="hidden md:block" />
             <span className="text-sm text-slate-500 font-medium mt-4 block">
-              当前支持：飞书类型平台（字节跳动、智谱、影视飓风等）
+              当前支持：飞书类型平台（字节跳动、智谱、影视飓风、小米等）
             </span>
           </p>
         </motion.div>

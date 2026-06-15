@@ -293,11 +293,11 @@ function App() {
             <img src={heroVisual} alt="" className="hero-visual" />
             <div className="hero-copy">
               <span className="eyebrow">字节社招 · 字节校招</span>
-              <h1>只看真正的新岗位</h1>
+              <h1>你就是下一个ByteDancer</h1>
               <p>
-                汇总字节跳动最新社招与校招岗位，先看发布时间，
+                根据时间看哪些岗位是新发布的再投递，投递两年前的岗位
                 <br />
-                再决定是否投递。
+                不是你没能力，而是根本不招人!
               </p>
             </div>
 

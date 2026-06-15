@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Activity, CalendarDays, Clock3, RefreshCw } from 'lucide-react'
+import { Activity, CalendarDays, Clock3 } from 'lucide-react'
 import { Analytics } from '@vercel/analytics/react'
 import {
   getJobDetail,
@@ -38,10 +38,14 @@ function getErrorMessage(error: unknown) {
 
 function formatSyncTime(value?: string | null) {
   if (!value) return '等待首次同步'
-  const date = new Date(value)
+  const hasTimezone = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value)
+  const date = new Date(hasTimezone ? value : `${value}Z`)
   if (Number.isNaN(date.getTime())) return '同步时间未知'
 
-  return `更新于 ${date.toLocaleTimeString('zh-CN', {
+  return `更新时间 ${date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
@@ -274,16 +278,9 @@ function App() {
           </button>
         </nav>
         <div className="sync-status">
-          <span className={health?.healthy === false ? 'is-stale' : ''} />
-          <strong>{health?.healthy === false ? '数据同步延迟' : '数据实时同步中'}</strong>
-          <small>{formatSyncTime(stats?.last_sync_at ?? health?.last_success_at)}</small>
-          <button
-            type="button"
-            aria-label="刷新数据"
-            onClick={handleRefresh}
-          >
-            <RefreshCw size={15} />
-          </button>
+          <small>
+            {formatSyncTime(health?.last_success_at ?? stats?.last_sync_at)}
+          </small>
         </div>
       </header>
 

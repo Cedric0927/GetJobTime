@@ -31,6 +31,8 @@ const freshDayOptions = [
   { value: 7, label: '7天内' },
   { value: 14, label: '14天内' },
   { value: 30, label: '30天内' },
+  { value: 60, label: '60天内' },
+  { value: 90, label: '90天内' },
 ]
 
 export function JobFilters({

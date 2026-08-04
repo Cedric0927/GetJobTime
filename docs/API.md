@@ -89,7 +89,7 @@ GET /jobs
 
 | 名称 | 类型 | 必填 | 说明 |
 |---|---|---|---|
-| `fresh_days` | int 1-30 | 否 | 只看最近 N 天发布的岗位（按 `publish_time`） |
+| `fresh_days` | int 1-90 | 否 | 只看最近 N 天发布的岗位（按 `publish_time`） |
 | `keyword` | str ≤100 | 否 | 模糊匹配标题/摘要；`fresh_days≤30` 时还匹配 description/requirement |
 | `category_id` | str | 否 | 职位类目 ID（从 `/jobs/filters` 取） |
 | `location_code` | str | 否 | 工作城市代码 |
@@ -327,7 +327,7 @@ X-API-Key: <key>
 | 场景 | 接口 |
 |---|---|
 | 默认页（最新岗位） | `GET /jobs?page_size=20&fresh_days=7` |
-| 时间段切换（1d/3d/7d/30d） | 同一个 `/jobs` 改 `fresh_days`，同步刷 `/jobs/filters` |
+| 时间段切换（1d/3d/7d/14d/30d/60d/90d） | 同一个 `/jobs` 改 `fresh_days`，同步刷 `/jobs/filters` |
 | 社招/校招切换 | `/jobs?source=bytedance_social` 或 `bytedance_campus` |
 | 卡片打开看 JD | `GET /jobs/{id}` |
 | 统计页头数字 | `GET /jobs/stats` |

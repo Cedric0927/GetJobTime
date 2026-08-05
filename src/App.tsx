@@ -21,6 +21,7 @@ import {
 import { JobList } from './features/jobs/JobList'
 import { InspectorView } from './features/inspector/InspectorView'
 import { ReferralSection } from './features/referrals/ReferralSection'
+import { SiteActions } from './components/SiteActions'
 import heroVisual from './assets/luckyjob-hero.png'
 
 type AppView = 'jobs' | 'inspector'
@@ -278,10 +279,13 @@ function App() {
             链接查时间
           </button>
         </nav>
-        <div className="sync-status">
-          <small>
-            {formatSyncTime(health?.last_success_at ?? stats?.last_sync_at)}
-          </small>
+        <div className="header-tools">
+          <div className="sync-status">
+            <small>
+              {formatSyncTime(health?.last_success_at ?? stats?.last_sync_at)}
+            </small>
+          </div>
+          <SiteActions />
         </div>
       </header>
 

@@ -150,6 +150,60 @@ button {
   white-space: nowrap;
 }
 
+.header-tools,
+.site-actions {
+  display: flex;
+  align-items: center;
+}
+
+.header-tools {
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.site-actions {
+  gap: 7px;
+}
+
+.site-actions > button {
+  height: 36px;
+  padding: 0 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e1e6ef;
+  border-radius: 9px;
+  color: #526074;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.site-actions > button:hover {
+  border-color: #b8ccfa;
+  color: var(--blue);
+  background: #f6f9ff;
+}
+
+.site-action-notice {
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 12px 16px;
+  position: fixed;
+  top: 88px;
+  right: max(20px, calc((100vw - 1380px) / 2));
+  z-index: 100;
+  border: 1px solid #d8e3fa;
+  border-radius: 11px;
+  color: #344054;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 14px 38px rgba(30, 49, 84, 0.14);
+  backdrop-filter: blur(16px);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .hero {
   min-height: 300px;
   padding: 66px max(28px, calc((100vw - 1380px) / 2)) 40px;
@@ -1321,6 +1375,24 @@ footer p {
 
   .brand {
     font-size: 21px;
+  }
+
+  .header-tools {
+    gap: 7px;
+  }
+
+  .sync-status {
+    display: none;
+  }
+
+  .site-actions > button {
+    height: 34px;
+    padding: 0 9px;
+  }
+
+  .site-action-notice {
+    top: 72px;
+    right: 16px;
   }
 
   .site-header nav {

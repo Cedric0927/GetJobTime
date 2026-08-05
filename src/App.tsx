@@ -20,6 +20,7 @@ import {
 } from './features/jobs/JobFilters'
 import { JobList } from './features/jobs/JobList'
 import { InspectorView } from './features/inspector/InspectorView'
+import { ReferralSection } from './features/referrals/ReferralSection'
 import heroVisual from './assets/luckyjob-hero.png'
 
 type AppView = 'jobs' | 'inspector'
@@ -354,6 +355,8 @@ function App() {
               />
             </div>
           </div>
+
+          <ReferralSection />
         </main>
       ) : (
         <InspectorView />

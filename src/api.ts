@@ -74,6 +74,31 @@ export interface JobsHealth {
   sources: JobSource[]
 }
 
+export interface ReferralCode {
+  id: string
+  company: string
+  code: string
+  recruitment_type: string
+  source_platform: string
+  source_post_id?: string | null
+  source_title?: string | null
+  source_author?: string | null
+  source_url?: string | null
+  confidence: number
+  source_count: number
+  first_seen_at: string
+  last_seen_at: string
+  last_verified_at: string
+  is_primary: boolean
+}
+
+export interface ReferralsResponse {
+  items: ReferralCode[]
+  total: number
+  active_days: number
+  generated_at: string
+}
+
 export interface JobTimeResponse {
   url: string
   host: string
@@ -193,6 +218,13 @@ export function getJobStats(signal?: AbortSignal) {
 
 export function getJobsHealth(signal?: AbortSignal) {
   return apiFetch<JobsHealth>('/jobs/health', { signal })
+}
+
+export function getReferrals(limit = 3, signal?: AbortSignal) {
+  return apiFetch<ReferralsResponse>(
+    `/referrals${toQueryString({ limit })}`,
+    { signal },
+  )
 }
 
 export function getJobDetail(id: string, signal?: AbortSignal) {

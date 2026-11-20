@@ -88,8 +88,10 @@ export interface ReferralCode {
   source_count: number
   first_seen_at: string
   last_seen_at: string
-  last_verified_at: string
+  last_verified_at: string | null
   is_primary: boolean
+  scope?: string | null
+  expires_at?: string | null
 }
 
 export interface ReferralsResponse {
@@ -225,6 +227,14 @@ export function getReferrals(limit = 3, signal?: AbortSignal) {
     `/referrals${toQueryString({ limit })}`,
     { signal },
   )
+}
+
+export function submitReferral(input: { code: string; recruitment_type: string; scope?: string; expires_on?: string }) {
+  return apiFetch<{ status: string }>('/referrals', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  })
 }
 
 export function getJobDetail(id: string, signal?: AbortSignal) {

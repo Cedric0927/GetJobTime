@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import {
   Check,
   Copy,
   RefreshCw,
-  ShieldCheck,
   Sparkles,
 } from 'lucide-react'
 import {
   getReferrals,
+  submitReferral,
   type ReferralCode,
   type ReferralsResponse,
 } from '../../api'
@@ -67,12 +67,8 @@ function ReferralCard({
       <div className="referral-card-topline">
         <div className="referral-badges">
           <span>{recruitmentType}</span>
-          {referral.is_primary && <strong>优先使用</strong>}
+          <span>用户分享</span>
         </div>
-        <span className="referral-confidence">
-          <ShieldCheck size={14} aria-hidden="true" />
-          可信度 {referral.confidence}%
-        </span>
       </div>
 
       <p className="referral-code-label">字节跳动内推码</p>
@@ -89,6 +85,8 @@ function ReferralCard({
         </button>
       </div>
 
+      {referral.scope && <p>{referral.scope}</p>}
+      {referral.expires_at && <p>展示至 {new Date(referral.expires_at).toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai' })}</p>}
     </article>
   )
 }
@@ -99,14 +97,19 @@ export function ReferralSection() {
   const [error, setError] = useState('')
   const [copiedCode, setCopiedCode] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
+  const [sharing, setSharing] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [shareMessage, setShareMessage] = useState('')
 
   useEffect(() => {
     const controller = new AbortController()
 
     getReferrals(5, controller.signal)
-      .then(setData)
+      .then((response) => {
+        if (!controller.signal.aborted) setData(response)
+      })
       .catch((requestError: unknown) => {
-        if ((requestError as { name?: string }).name !== 'AbortError') {
+        if (!controller.signal.aborted) {
           setError(
             requestError instanceof Error
               ? requestError.message
@@ -114,7 +117,7 @@ export function ReferralSection() {
           )
         }
       })
-      .finally(() => setLoading(false))
+      .finally(() => { if (!controller.signal.aborted) setLoading(false) })
 
     return () => controller.abort()
   }, [refreshKey])
@@ -135,6 +138,30 @@ export function ReferralSection() {
     setRefreshKey((key) => key + 1)
   }
 
+  const communityItems = data?.items.filter((item) => item.source_platform === 'community') ?? []
+
+  const handleShare = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    setSubmitting(true)
+    setShareMessage('')
+    try {
+      await submitReferral({
+        code: String(form.get('code')).trim(),
+        recruitment_type: String(form.get('recruitment_type')),
+        scope: String(form.get('scope')).trim() || undefined,
+        expires_on: String(form.get('expires_on')) || undefined,
+      })
+      setSharing(false)
+      setShareMessage('内推码已发布，谢谢分享！')
+      handleRetry()
+    } catch (requestError) {
+      setShareMessage(requestError instanceof Error ? requestError.message : '提交失败，请稍后重试。')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <section className="referral-section" aria-labelledby="referral-title">
       <div className="referral-heading">
@@ -143,17 +170,30 @@ export function ReferralSection() {
             <Sparkles size={15} aria-hidden="true" />
             助力投递
           </span>
-          <h2 id="referral-title">找到岗位，再用内推码完成投递</h2>
-          <p>精选近期验证的字节跳动内推码，复制后前往官方招聘页面使用。</p>
+          <h2 id="referral-title">内推互助</h2>
+          <p>分享字节跳动内推码，帮正在找工作的朋友投递。不用先分享，也能复制使用。</p>
         </div>
-        {data && data.total > 0 && (
+        {data && communityItems.length > 0 && (
           <div className="referral-summary">
             <strong>{data.total}</strong>
-            <span>个有效内推码</span>
+            <span>个用户分享码</span>
             <small>{formatUpdatedTime(data.generated_at)}</small>
           </div>
         )}
       </div>
+
+      <div className="referral-actions">
+        <button type="button" aria-expanded={sharing} disabled={submitting} onClick={() => { setSharing(!sharing); setShareMessage('') }}>{sharing ? '收起表单' : '分享内推码'}</button>
+      </div>
+      {sharing && <form className="referral-card referral-form" onSubmit={handleShare}>
+        <label>内推码<input name="code" required minLength={3} maxLength={32} pattern="[A-Za-z0-9_\-]{3,32}" autoComplete="off" /></label>
+        <label>招聘类型<select name="recruitment_type"><option value="unknown">通用／不确定</option><option value="campus">校招</option><option value="social">社招</option></select></label>
+        <label>适用岗位（选填）<input name="scope" maxLength={80} /></label>
+        <label>有效期（选填，北京时间）<input name="expires_on" type="date" /></label>
+        <p className="referral-note">提交后公开展示。只分享你有权公开的码，请勿填写姓名或联系方式。</p>
+        <div className="referral-actions"><button type="submit" disabled={submitting}>{submitting ? '发布中…' : '发布内推码'}</button></div>
+      </form>}
+      {shareMessage && <p role="status">{shareMessage}</p>}
 
       {loading ? (
         <div className="referral-state">
@@ -167,9 +207,9 @@ export function ReferralSection() {
             重新加载
           </button>
         </div>
-      ) : data?.items.length ? (
+      ) : communityItems.length ? (
         <div className="referral-grid">
-          {data.items.map((referral) => (
+          {communityItems.map((referral) => (
             <ReferralCard
               key={referral.id}
               referral={referral}
@@ -179,11 +219,11 @@ export function ReferralSection() {
           ))}
         </div>
       ) : (
-        <div className="referral-state">当前暂无可用内推码，请稍后再来看看。</div>
+        <div className="referral-state">暂无可用内推码，欢迎分享一个。</div>
       )}
 
       <p className="referral-note">
-        内推码来自公开信息并定期核验，实际有效性以字节跳动官方投递页面为准。
+        内推码由用户分享，未经官方验证。是否可用以字节跳动官方投递页面为准。
       </p>
     </section>
   )

@@ -1,13 +1,19 @@
 # JobTime API 文档（前端用）
 
 > 基础路径: `https://api.apphome.me/api/v1/apps/jobtime`
-> 鉴权：除 `health`、`jobs`、`jobs/filters`、`jobs/stats`、`jobs/{id}`、`inspect` 外，其余端点需要
+> 鉴权：除 `health`、`jobs`、`jobs/filters`、`jobs/stats`、`jobs/{id}`、`inspect`、`referrals` 外，其余端点需要
 > `X-API-Key: <key>` 头（key 在 `/etc/canvas-design.env` 的 `API_KEYS`）。
 >
 > 时间字段统一为 ISO-8601 UTC（`2026-06-15T03:00:00.000000Z`）。
 > 所有分页参数：`page` ≥ 1、`page_size` 1-100。
 
 ---
+
+## 内推互助
+
+- `GET /referrals?limit=5`：仅返回用户分享且尚未到期的字节跳动内推码，不包含历史爬取数据。
+- `POST /referrals`：提交 `code`、`recruitment_type`（`campus` / `social` / `unknown`），可选 `scope` 和北京时间的 `expires_on`（`YYYY-MM-DD`）。成功返回 `201` 和 `{"status":"published"}`，无需审核。
+- 同码按不区分大小写去重，展示保留原样。展示最多 45 天；填写较早的有效日期时，以该日北京时间结束为准。重复返回 `409`，同一客户端一小时内超过 5 次有效格式的提交尝试返回 `429`。
 
 ## 数据来源
 

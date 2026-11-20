@@ -1,4 +1,12 @@
-# React + TypeScript + Vite
+# LuckyJob
+
+## 前端生产发布
+
+前端由 `124.222.76.67` 的 Nginx 提供服务，域名为 `jobinfo.apphome.me`；Vercel Git 自动部署已关闭。当前使用已有 SSH 权限手动运行 `pwsh -File scripts/deploy-frontend.ps1`。脚本构建并上传独立发布目录，再原子切换 `/var/www/luckyjob/current`；旧发布目录保留供回滚。后端部署流程不变。
+
+首次配置参考 `deploy/luckyjob.nginx.conf`；它只用于初次启用 HTTP，不能覆盖 Certbot 管理的线上 HTTPS 配置。
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

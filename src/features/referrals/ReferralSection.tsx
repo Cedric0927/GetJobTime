@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { track } from '../../analytics'
 import {
   Check,
   Copy,
@@ -44,8 +45,9 @@ async function copyText(value: string) {
   input.style.opacity = '0'
   document.body.appendChild(input)
   input.select()
-  document.execCommand('copy')
+  const copied = document.execCommand('copy')
   input.remove()
+  if (!copied) throw new Error('Copy failed')
 }
 
 function ReferralCard({
@@ -125,6 +127,7 @@ export function ReferralSection() {
   const handleCopy = async (code: string) => {
     try {
       await copyText(code)
+      track('referral_copy')
       setCopiedCode(code)
       window.setTimeout(() => setCopiedCode(''), 1800)
     } catch {

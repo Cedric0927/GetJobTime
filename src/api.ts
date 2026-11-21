@@ -1,3 +1,5 @@
+import { analyticsHeaders } from './analytics'
+
 const API_BASE_URL =
   import.meta.env.VITE_JOBTIME_API_URL ??
   (import.meta.env.DEV
@@ -232,7 +234,7 @@ export function getReferrals(limit = 3, signal?: AbortSignal) {
 export function submitReferral(input: { code: string; recruitment_type: string; scope?: string; expires_on?: string }) {
   return apiFetch<{ status: string }>('/referrals', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...analyticsHeaders },
     body: JSON.stringify(input),
   })
 }
@@ -247,6 +249,7 @@ export function inspectJob(url: string, signal?: AbortSignal) {
     signal,
     headers: {
       'Content-Type': 'application/json',
+      ...analyticsHeaders,
     },
     body: JSON.stringify({ url }),
   })

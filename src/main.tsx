@@ -2,9 +2,14 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import { track } from './analytics'
+import { AnalyticsDashboard } from './AnalyticsDashboard'
+
+const isDashboard = window.location.pathname.replace(/\/$/, '') === '/admin/analytics'
+if (!isDashboard) track('page_view')
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    {isDashboard ? <AnalyticsDashboard /> : <App />}
   </StrictMode>,
 )

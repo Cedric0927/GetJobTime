@@ -6,6 +6,13 @@
 
 首次配置参考 `deploy/luckyjob.nginx.conf`；它只用于初次启用 HTTP，不能覆盖 Certbot 管理的线上 HTTPS 配置。
 
+## 运营日报
+
+- 入口：`/admin/analytics`。日报以北京时间自然日汇总，支持近 7 天和 30 天。
+- 上线前，在后端 systemd 服务的环境文件里配置独立的高强度 `JOBTIME_ANALYTICS_TOKEN`，不要写进 Git 或前端环境变量。部署后端时执行 Alembic 迁移，再发布前端。
+- 发布后验证：不带令牌查询日报应返回 `401`；在页面输入令牌应能查询。正常浏览一次公开首页后，刷新日报检查页面浏览事件。UV 是匿名浏览器数，不等于真实人数。
+- 不回填历史数据。公开事件可能受浏览器拦截或自动访问影响，不作为精确审计数据。
+
 ## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

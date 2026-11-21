@@ -9,6 +9,7 @@ import {
 import { format, parseISO } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import type { JobDetail, JobListItem } from '../../api'
+import { track } from '../../analytics'
 
 interface JobDetailPanelProps {
   job: JobListItem | null
@@ -143,6 +144,7 @@ export function JobDetailPanel({
             target="_blank"
             rel="noreferrer"
             className="apply-button"
+            onClick={() => track('apply_click')}
           >
             前往官网投递
             <ArrowUpRight size={18} />

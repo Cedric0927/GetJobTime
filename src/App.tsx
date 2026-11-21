@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Activity, CalendarDays, Clock3 } from 'lucide-react'
-import { Analytics } from '@vercel/analytics/react'
+import { track } from './analytics'
 import {
   getJobDetail,
   getJobFilters,
@@ -73,6 +73,7 @@ function App() {
   const [detailError, setDetailError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
   const firstRequest = useRef(true)
+  const trackedKeyword = useRef('')
   const pageSize = 20
 
   useEffect(() => {
@@ -119,6 +120,10 @@ function App() {
   useEffect(() => {
     const controller = new AbortController()
 
+    if (debouncedKeyword !== trackedKeyword.current) {
+      trackedKeyword.current = debouncedKeyword
+      if (debouncedKeyword) track('job_search')
+    }
     getJobs(
       {
         fresh_days: filters.freshDays,
@@ -212,6 +217,10 @@ function App() {
   )
 
   const handleFiltersChange = (next: JobFilterState) => {
+    if (filters.source !== next.source) {
+      if (next.source === 'bytedance_social') track('filter_social')
+      if (next.source === 'bytedance_campus') track('filter_campus')
+    }
     setPage(1)
     setJobsLoading(true)
     setJobsError('')
@@ -232,6 +241,7 @@ function App() {
   }
 
   const handleSelectJob = (job: JobListItem) => {
+    track('job_detail')
     setDetailLoading(true)
     setDetailError('')
     setJobDetail(null)
@@ -370,7 +380,6 @@ function App() {
         <span>LuckyJob</span>
         <p>只看真实发布时间，把精力留给更值得的机会。</p>
       </footer>
-      <Analytics />
     </div>
   )
 }

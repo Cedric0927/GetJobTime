@@ -22,9 +22,10 @@ import { JobList } from './features/jobs/JobList'
 import { InspectorView } from './features/inspector/InspectorView'
 import { ReferralSection } from './features/referrals/ReferralSection'
 import { SiteActions } from './components/SiteActions'
+import { OfferTower } from './components/OfferTower'
 import heroVisual from './assets/luckyjob-hero.png'
 
-type AppView = 'jobs' | 'inspector'
+type AppView = 'jobs' | 'inspector' | 'offer'
 
 const initialFilters: JobFilterState = {
   keyword: '',
@@ -263,6 +264,10 @@ function App() {
     setRefreshKey((value) => value + 1)
   }
 
+  if (view === 'offer') {
+    return <OfferTower onExit={() => setView('jobs')} />
+  }
+
   return (
     <div className="app-shell">
       <header className="site-header">
@@ -287,6 +292,9 @@ function App() {
             onClick={() => setView('inspector')}
           >
             链接查时间
+          </button>
+          <button type="button" onClick={() => setView('offer')}>
+            ✦ 拜 Offer 大楼
           </button>
         </nav>
         <div className="header-tools">

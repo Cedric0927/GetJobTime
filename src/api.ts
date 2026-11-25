@@ -6,7 +6,15 @@ const API_BASE_URL =
     ? '/api/jobtime'
     : 'https://api.apphome.me/api/v1/apps/jobtime')
 
-export type JobSource = 'bytedance_social' | 'bytedance_campus'
+export type JobSource = string
+
+export interface JobSourceMetadata {
+  id: JobSource
+  company_id: string
+  company_name: string
+  channel_label: string
+  channel_kind: string
+}
 export type FreshnessBucket = '1d' | '3d' | '7d' | '30d' | 'older'
 
 export interface JobListItem {
@@ -23,8 +31,9 @@ export interface JobListItem {
   location_name?: string | null
   department?: string | null
   recruitment_type?: string | null
-  publish_time: string
-  publish_timestamp_ms: number
+  publish_time: string | null
+  publish_date?: string | null
+  publish_timestamp_ms: number | null
   age_days: number
   freshness_bucket: FreshnessBucket
   status: string
@@ -59,6 +68,7 @@ export interface JobFiltersResponse {
 
 export interface JobStats {
   sources: JobSource[]
+  source_catalog?: JobSourceMetadata[]
   fresh_1_days: number
   fresh_3_days: number
   fresh_7_days: number

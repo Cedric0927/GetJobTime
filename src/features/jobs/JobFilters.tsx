@@ -8,13 +8,16 @@ import {
 import type {
   JobFiltersResponse,
   JobSource,
+  JobSourceMetadata,
 } from '../../api'
+import { sourceLabel } from './jobSources'
 
 export interface JobFilterState {
   keyword: string
   freshDays: number
   source: '' | JobSource
   locationCode: string
+  recruitmentType: string
   categoryId: string
 }
 
@@ -22,6 +25,7 @@ interface JobFiltersProps {
   value: JobFilterState
   options: JobFiltersResponse | null
   loading: boolean
+  sources: JobSourceMetadata[]
   onChange: (next: JobFilterState) => void
 }
 
@@ -39,8 +43,15 @@ export function JobFilters({
   value,
   options,
   loading,
+  sources,
   onChange,
 }: JobFiltersProps) {
+  const groups = new Map<string, JobSourceMetadata[]>()
+  for (const source of sources) {
+    const group = groups.get(source.company_id) ?? []
+    group.push(source)
+    groups.set(source.company_id, group)
+  }
   const update = <K extends keyof JobFilterState>(
     key: K,
     next: JobFilterState[K],
@@ -52,6 +63,7 @@ export function JobFilters({
       freshDays: 30,
       source: '',
       locationCode: '',
+      recruitmentType: '',
       categoryId: '',
     })
 
@@ -91,8 +103,13 @@ export function JobFilters({
           }
         >
           <option value="">全部岗位</option>
-          <option value="bytedance_social">社招岗位</option>
-          <option value="bytedance_campus">校招岗位</option>
+          {[...groups].map(([companyId, group]) => (
+            <optgroup key={companyId} label={group[0].company_name || '其他来源'}>
+              {group.map((source) => (
+                <option key={source.id} value={source.id}>{sourceLabel(source)}</option>
+              ))}
+            </optgroup>
+          ))}
         </select>
       </label>
 
@@ -109,6 +126,20 @@ export function JobFilters({
             <option key={option.id} value={option.id}>
               {option.name} ({option.count})
             </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="select-control">
+        <span className="sr-only">招聘类型</span>
+        <select
+          value={value.recruitmentType}
+          disabled={loading}
+          onChange={(event) => update('recruitmentType', event.target.value)}
+        >
+          <option value="">全部招聘类型</option>
+          {options?.recruitment_types.map((option) => (
+            <option key={option.id} value={option.id}>{option.name} ({option.count})</option>
           ))}
         </select>
       </label>

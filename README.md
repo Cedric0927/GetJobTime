@@ -2,7 +2,9 @@
 
 ## 前端生产发布
 
-前端由 `124.222.76.67` 的 Nginx 提供服务，域名为 `jobinfo.apphome.me`；Vercel Git 自动部署已关闭。当前使用已有 SSH 权限手动运行 `pwsh -File scripts/deploy-frontend.ps1`。脚本构建并上传独立发布目录，再原子切换 `/var/www/luckyjob/current`；旧发布目录保留供回滚。后端部署流程不变。
+前端由 `124.222.76.67` 的 Nginx 提供服务，域名为 `jobinfo.apphome.me`；Vercel Git 自动部署已关闭。GitHub Actions 在 `main` 推送后安装锁定依赖、运行 ESLint 和构建，通过后再上传独立发布目录并原子切换 `/var/www/luckyjob/current`。旧发布目录保留供回滚，后端部署流程不变。
+
+首发前在本仓库的 Actions Secrets 配置专用部署密钥 `LUCKYJOB_SSH_PRIVATE_KEY` 和经过独立确认的服务器公钥记录 `LUCKYJOB_SSH_KNOWN_HOSTS`。不要复用个人 SSH 私钥。也可从 `main` 手动运行该工作流；本地应急发布仍可使用 `pwsh -File scripts/deploy-frontend.ps1`。
 
 首次配置参考 `deploy/luckyjob.nginx.conf`；它只用于初次启用 HTTP，不能覆盖 Certbot 管理的线上 HTTPS 配置。
 

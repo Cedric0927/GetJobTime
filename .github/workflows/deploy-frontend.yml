@@ -1,0 +1,56 @@
+name: Deploy LuckyJob frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: luckyjob-frontend-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm build
+      - name: Publish verified build
+        shell: pwsh
+        env:
+          DEPLOY_KEY: ${{ secrets.LUCKYJOB_SSH_PRIVATE_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.LUCKYJOB_SSH_KNOWN_HOSTS }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          if (!$env:DEPLOY_KEY -or !$env:DEPLOY_KNOWN_HOSTS) {
+            throw 'Configure LUCKYJOB_SSH_PRIVATE_KEY and LUCKYJOB_SSH_KNOWN_HOSTS.'
+          }
+          $dir = Join-Path $HOME '.ssh'
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          chmod 700 $dir
+          $key = Join-Path $dir 'id_ed25519'
+          $hosts = Join-Path $dir 'known_hosts'
+          try {
+            Set-Content -LiteralPath $key -Value $env:DEPLOY_KEY -Encoding utf8NoBOM
+            chmod 600 $key
+            Set-Content -LiteralPath $hosts -Value $env:DEPLOY_KNOWN_HOSTS -Encoding utf8NoBOM
+            Remove-Item Env:DEPLOY_KEY, Env:DEPLOY_KNOWN_HOSTS
+            ./scripts/deploy-frontend.ps1 -Server 'ubuntu@124.222.76.67' -SkipBuild
+          } finally {
+            Remove-Item -LiteralPath $key, $hosts -ErrorAction SilentlyContinue
+          }

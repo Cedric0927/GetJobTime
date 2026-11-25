@@ -8,18 +8,20 @@ import {
 } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
-import type { JobDetail, JobListItem } from '../../api'
+import type { JobDetail, JobListItem, JobSourceMetadata } from '../../api'
+import { sourceLabel } from './jobSources'
 import { track } from '../../analytics'
 
 interface JobDetailPanelProps {
   job: JobListItem | null
   detail: JobDetail | null
+  source?: JobSourceMetadata
   loading: boolean
   error: string
   onClose: () => void
 }
 
-function formatPublishTime(value?: string) {
+function formatPublishTime(value?: string | null) {
   if (!value) return '发布时间未知'
 
   try {
@@ -49,6 +51,7 @@ function DetailText({
 export function JobDetailPanel({
   job,
   detail,
+  source,
   loading,
   error,
   onClose,
@@ -89,17 +92,17 @@ export function JobDetailPanel({
           <div className="detail-tags">
             <span
               className={
-                visibleJob.source === 'bytedance_campus'
+                source?.channel_kind === 'campus'
                   ? 'source-badge campus'
                   : 'source-badge'
               }
             >
-              {visibleJob.source === 'bytedance_campus' ? '校招' : '社招'}
+              {sourceLabel(source)}
             </span>
             {visibleJob.category_name && <span>{visibleJob.category_name}</span>}
           </div>
           <h2>{visibleJob.title}</h2>
-          <p>{visibleJob.department || '字节跳动'}</p>
+          <p>{visibleJob.department || '团队待确认'}</p>
           <div className="detail-meta">
             <span>
               <MapPin size={15} />
@@ -107,7 +110,9 @@ export function JobDetailPanel({
             </span>
             <span>
               <CalendarDays size={15} />
-              {formatPublishTime(visibleJob.publish_time)}
+              {visibleJob.publish_date
+                ? visibleJob.publish_date.replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$1年$2月$3日')
+                : formatPublishTime(visibleJob.publish_time)}
             </span>
           </div>
         </div>

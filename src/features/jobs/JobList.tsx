@@ -1,8 +1,10 @@
 import { ChevronLeft, ChevronRight, Inbox, LoaderCircle } from 'lucide-react'
-import type { JobListItem } from '../../api'
+import type { JobListItem, JobSourceMetadata } from '../../api'
+import { sourceLabel } from './jobSources'
 
 interface JobListProps {
   items: JobListItem[]
+  sourceById: ReadonlyMap<string, JobSourceMetadata>
   selectedId?: string
   loading: boolean
   error: string
@@ -22,6 +24,7 @@ function freshnessLabel(job: JobListItem) {
 
 export function JobList({
   items,
+  sourceById,
   selectedId,
   loading,
   error,
@@ -78,15 +81,15 @@ export function JobList({
                   <strong>{job.title}</strong>
                   <span
                     className={
-                      job.source === 'bytedance_campus'
+                      sourceById.get(job.source)?.channel_kind === 'campus'
                         ? 'source-badge campus'
                         : 'source-badge'
                     }
                   >
-                    {job.source === 'bytedance_campus' ? '校招' : '社招'}
+                    {sourceLabel(sourceById.get(job.source))}
                   </span>
                 </span>
-                <span className="job-department">{job.department || '字节跳动'}</span>
+                <span className="job-department">{job.department || '团队待确认'}</span>
                 <span className="job-summary">
                   {job.description_summary || '查看岗位详情与任职要求'}
                 </span>

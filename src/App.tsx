@@ -19,6 +19,7 @@ import {
   type JobFilterState,
 } from './features/jobs/JobFilters'
 import { JobList } from './features/jobs/JobList'
+import { getSourceCatalog } from './features/jobs/jobSources'
 import { InspectorView } from './features/inspector/InspectorView'
 import { ReferralSection } from './features/referrals/ReferralSection'
 import { SiteActions } from './components/SiteActions'
@@ -31,6 +32,7 @@ const initialFilters: JobFilterState = {
   keyword: '',
   freshDays: 30,
   source: '',
+  recruitmentType: '',
   locationCode: '',
   categoryId: '',
 }
@@ -67,6 +69,8 @@ function App() {
   const [filtersData, setFiltersData] = useState<JobFiltersResponse | null>(null)
   const [filtersLoading, setFiltersLoading] = useState(true)
   const [stats, setStats] = useState<JobStats | null>(null)
+  const sources = useMemo(() => getSourceCatalog(stats), [stats])
+  const sourceById = useMemo(() => new Map(sources.map((source) => [source.id, source])), [sources])
   const [health, setHealth] = useState<JobsHealth | null>(null)
   const [selectedJob, setSelectedJob] = useState<JobListItem | null>(null)
   const [jobDetail, setJobDetail] = useState<JobDetail | null>(null)
@@ -131,6 +135,7 @@ function App() {
         keyword: debouncedKeyword || undefined,
         source: filters.source || undefined,
         location_code: filters.locationCode || undefined,
+        recruitment_type: filters.recruitmentType || undefined,
         category_id: filters.categoryId || undefined,
         page,
         page_size: pageSize,
@@ -166,6 +171,7 @@ function App() {
     filters.categoryId,
     filters.freshDays,
     filters.locationCode,
+    filters.recruitmentType,
     filters.source,
     page,
     refreshKey,
@@ -235,7 +241,7 @@ function App() {
     setJobDetail(null)
     setFilters((current) => {
       if (current.source !== next.source) {
-        return { ...next, locationCode: '', categoryId: '' }
+        return { ...next, locationCode: '', categoryId: '', recruitmentType: '' }
       }
       return next
     })
@@ -312,8 +318,8 @@ function App() {
           <section className="hero">
             <img src={heroVisual} alt="" className="hero-visual" />
             <div className="hero-copy">
-              <span className="eyebrow">字节社招 · 字节校招</span>
-              <h1>你就是下一个ByteDancer</h1>
+              <span className="eyebrow">招聘岗位 · 发布时间</span>
+              <h1>先看发布时间，再投递</h1>
               <p>
                 根据时间看哪些岗位是新发布的再投递，投递两年前的岗位
                 <br />
@@ -348,6 +354,7 @@ function App() {
             <JobFilters
               value={filters}
               options={filtersData}
+              sources={sources}
               loading={filtersLoading}
               onChange={handleFiltersChange}
             />
@@ -355,6 +362,7 @@ function App() {
             <div className="workspace-grid">
               <JobList
                 items={jobs}
+                sourceById={sourceById}
                 selectedId={selectedJob?.id}
                 loading={jobsLoading}
                 error={jobsError}
@@ -368,6 +376,7 @@ function App() {
               <JobDetailPanel
                 job={selectedJob}
                 detail={jobDetail}
+                source={selectedJob ? sourceById.get(selectedJob.source) : undefined}
                 loading={detailLoading}
                 error={detailError}
                 onClose={() => {
